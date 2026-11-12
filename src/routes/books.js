@@ -38,4 +38,41 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  try {
+    const { title, author, year } = req.body;
+
+    if (!title) {
+      return res.status(404).json({
+        message: "The `title` field is required!",
+      });
+    }
+
+    if (!author) {
+      return res.status(404).json({
+        message: "The `author` field is required!",
+      });
+    }
+
+    if (year === undefined || year > new Date().getFullYear()) {
+      return res.status(404).json({
+        message:
+          "The `year` field is required, and cannot be greater then the current!",
+      });
+    }
+
+    await db.insert(books).values({
+      title: title,
+      author: author,
+      year: year,
+    });
+
+    return res.status(201).json({
+      message: "Book created successfully!",
+    });
+  } catch (err) {
+    return renderErrorHandler(res, err);
+  }
+});
+
 module.exports = router;
